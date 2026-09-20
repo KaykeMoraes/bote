@@ -37,24 +37,40 @@ export const Login = () => {
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={handleSubmit}
+        className="mx-auto mt-24 flex w-full max-w-sm flex-col gap-4 rounded-xl border border-gray-200 bg-white p-8 shadow-lg"
+      >
         <input
           type="email"
           placeholder="email@exemplo.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 placeholder-gray-400 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
         />
         <input
           type="password"
           placeholder="Digite sua senha"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 placeholder-gray-400 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
         />
-        {error && <p className="text-red-600">{error}</p>}
+        {error && <p className="text-sm text-red-600">{error}</p>}
 
-        <button type="submit">Entrar</button>
-        <p>
-          Não possui uma conta? <Link to="/register">Criar conta</Link>
+        <button
+          type="submit"
+          className="w-full cursor-pointer rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700 focus:ring-2 focus:ring-blue-300 focus:outline-none"
+        >
+          Entrar
+        </button>
+        <p className="text-center text-sm text-gray-600">
+          Não possui uma conta?{' '}
+          <Link
+            to="/register"
+            className="font-medium text-blue-600 hover:underline"
+          >
+            Criar conta
+          </Link>
         </p>
       </form>
     </>
