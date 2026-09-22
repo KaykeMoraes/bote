@@ -10,7 +10,11 @@ export const ProtectedRoutes = ({ children }: ProtectedProps) => {
   const { user, loading } = useAuth()
 
   if (loading) {
-    return <p>Carregando...</p>
+    return (
+      <p className="min-h-screen bg-gray-50 p-4 text-neutral-900 dark:bg-neutral-950 dark:text-gray-100">
+        Carregando...
+      </p>
+    )
   }
 
   if (!user) {

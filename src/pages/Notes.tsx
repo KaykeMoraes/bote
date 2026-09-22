@@ -1,3 +1,10 @@
+import { DarkModeButton } from '../components/DarkModeButton'
+
 export const Notes = () => {
-  return <p>notes</p>
+  return (
+    <main className="min-h-screen bg-gray-50 p-4 text-neutral-900 dark:bg-neutral-950 dark:text-gray-100">
+      <DarkModeButton />
+      <p className="mt-4">notes</p>
+    </main>
+  )
 }
