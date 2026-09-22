@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { login } from '../services/auth'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { FirebaseError } from 'firebase/app'
 
 export const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const navigate = useNavigate()
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -14,6 +15,7 @@ export const Login = () => {
 
     try {
       await login(email, password)
+      navigate('/notes')
     } catch (error) {
       if (error instanceof FirebaseError) {
         switch (error.code) {
