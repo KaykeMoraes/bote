@@ -1,4 +1,3 @@
-import { DarkModeButton } from '../components/DarkModeButton'
 import { SideBar } from '../components/SideBar'
 
 export const Home = () => {
