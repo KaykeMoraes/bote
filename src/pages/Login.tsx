@@ -21,7 +21,7 @@ export const Login = () => {
 
     try {
       await login(email, password)
-      navigate('/notes')
+      navigate('/')
     } catch (error) {
       if (error instanceof FirebaseError) {
         switch (error.code) {
