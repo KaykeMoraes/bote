@@ -21,7 +21,7 @@ export const Register = () => {
 
     try {
       await register(email, password)
-      navigate('/notes')
+      navigate('/')
     } catch (error) {
       if (error instanceof FirebaseError) {
         switch (error.code) {
