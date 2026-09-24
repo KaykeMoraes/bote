@@ -84,7 +84,7 @@ export const Register = () => {
         )}
         <button
           type="submit"
-          className="w-full cursor-pointer rounded-lg bg-neutral-600 px-4 py-2 font-medium text-white transition hover:bg-neutral-700 focus:ring-2 focus:outline-none dark:bg-neutral-950 dark:hover:bg-neutral-900 dark:border dark:border-neutral-400 dark:focus:ring-neutral-700"
+          className="w-full cursor-pointer rounded-lg bg-neutral-950 px-4 py-2 font-medium text-white transition hover:bg-neutral-700 focus:ring-2 focus:outline-none dark:bg-neutral-950 dark:hover:bg-neutral-900 dark:border dark:border-neutral-400 dark:focus:ring-neutral-700"
         >
           Criar conta
         </button>
