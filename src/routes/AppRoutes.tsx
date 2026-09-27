@@ -3,7 +3,7 @@ import { Login } from '../pages/Login'
 import { Register } from '../pages/Register'
 import { ProtectedRoutes } from './ProtectedRoutes'
 import { Home } from '../pages/Home'
-import { NewNote } from '../pages/NewNote'
+import { NotePage } from '../pages/NotePage'
 
 export const AppRoutes = () => {
   return (
@@ -18,12 +18,20 @@ export const AppRoutes = () => {
               <Home />
             </ProtectedRoutes>
           }
-          />
+        />
         <Route
           path="/notes/new"
           element={
             <ProtectedRoutes>
-              <NewNote />
+              <NotePage />
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path="/notes/:noteId"
+          element={
+            <ProtectedRoutes>
+              <NotePage />
             </ProtectedRoutes>
           }
         />

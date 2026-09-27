@@ -17,6 +17,8 @@ export const DarkModeButton = () => {
   return (
     <button
       onClick={toggleTheme}
+      aria-label={`Ativar modo ${theme === 'light' ? 'escuro' : 'claro'}`}
+      title={`Ativar modo ${theme === 'light' ? 'escuro' : 'claro'}`}
       className="rounded-md bg-neutral-50 border border-neutral-300 px-3 py-2 transition-colors duration-150 hover:bg-neutral-200 hover:cursor-pointer dark:bg-neutral-950 dark:border-neutral-800 dark:hover:bg-neutral-900"
     >
       {theme === 'light' ? (
