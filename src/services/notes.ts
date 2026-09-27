@@ -3,6 +3,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   orderBy,
   query,
@@ -48,6 +49,26 @@ export const getNotes = async () => {
     id: doc.id,
     ...doc.data(),
   })) as Note[]
+}
+
+export const getNoteById = async (noteId: string) => {
+  const user = auth.currentUser
+
+  if (!user) {
+    throw new Error('Usuário não está autenticado')
+  }
+
+  const noteRef = doc(db, 'users', user.uid, 'notes', noteId)
+  const snapshot = await getDoc(noteRef)
+
+  if (!snapshot.exists()) {
+    return null
+  }
+
+  return {
+    id: snapshot.id,
+    ...snapshot.data(),
+  } as Note
 }
 
 export const updatedNote = async (
