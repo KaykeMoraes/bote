@@ -6,7 +6,12 @@ import { Brand } from '../components/Brand'
 import { DarkModeButton } from '../components/DarkModeButton'
 import { MarkdownPreview } from '../components/MarkdownPreview'
 import { TextInput } from '../components/TextInput'
-import { createNote, getNoteById, updatedNote } from '../services/notes'
+import {
+  createNote,
+  deleteNote,
+  getNoteById,
+  updatedNote,
+} from '../services/notes'
 import type { Note } from '../types/note'
 
 type EditorMode = 'edit' | 'preview' | 'split'
@@ -20,8 +25,10 @@ export const NotePage = () => {
   const [mode, setMode] = useState<EditorMode>('edit')
   const [loading, setLoading] = useState(Boolean(noteId))
   const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [saveMessage, setSaveMessage] = useState('')
   const [error, setError] = useState('')
+  const [selection, setSelection] = useState({ start: 0, end: 0 })
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const isDirty = note
@@ -112,6 +119,26 @@ export const NotePage = () => {
     return () => window.clearTimeout(timeout)
   }, [isDirty, note, saveNote, saving])
 
+  const handleDeleteNote = async () => {
+    if (!note) return
+
+    const confirmed = window.confirm(
+      'Excluir esta nota? Essa ação não pode ser desfeita.'
+    )
+    if (!confirmed) return
+
+    setDeleting(true)
+    setError('')
+    try {
+      await deleteNote(note.id)
+      navigate('/', { replace: true })
+    } catch (deleteError) {
+      setError('Não foi possível excluir a nota.')
+      console.error(deleteError)
+      setDeleting(false)
+    }
+  }
+
   const insertMarkdown = (
     before: string,
     after = before,
@@ -140,6 +167,85 @@ export const NotePage = () => {
     })
   }
 
+  const isMarkerActive = (marker: string) => {
+    const { start, end } = selection
+    const selected = content.slice(start, end)
+    const wrappedSelection =
+      selected.length >= marker.length * 2 &&
+      selected.startsWith(marker) &&
+      selected.endsWith(marker)
+    const before = content.slice(Math.max(0, start - marker.length), start)
+    const after = content.slice(end, end + marker.length)
+    return wrappedSelection || (before === marker && after === marker)
+  }
+
+  const toggleMarkdown = (marker: string, placeholder = 'texto') => {
+    const textarea = textareaRef.current
+    if (!textarea) return
+
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const selected = content.slice(start, end)
+
+    if (
+      selected.length >= marker.length * 2 &&
+      selected.startsWith(marker) &&
+      selected.endsWith(marker)
+    ) {
+      const unwrapped = selected.slice(
+        marker.length,
+        selected.length - marker.length
+      )
+      setContent(content.slice(0, start) + unwrapped + content.slice(end))
+      window.requestAnimationFrame(() => {
+        textarea.focus()
+        textarea.setSelectionRange(start, start + unwrapped.length)
+      })
+      return
+    }
+
+    const before = content.slice(Math.max(0, start - marker.length), start)
+    const after = content.slice(end, end + marker.length)
+    if (before === marker && after === marker) {
+      setContent(
+        content.slice(0, start - marker.length) +
+          selected +
+          content.slice(end + marker.length)
+      )
+      window.requestAnimationFrame(() => {
+        textarea.focus()
+        textarea.setSelectionRange(start - marker.length, end - marker.length)
+      })
+      return
+    }
+
+    const textToWrap = selected || placeholder
+    setContent(
+      content.slice(0, start) +
+        marker +
+        textToWrap +
+        marker +
+        content.slice(end)
+    )
+    window.requestAnimationFrame(() => {
+      textarea.focus()
+      const selectionStart = start + marker.length
+      textarea.setSelectionRange(
+        selectionStart,
+        selectionStart + textToWrap.length
+      )
+    })
+  }
+
+  const updateSelection = () => {
+    const textarea = textareaRef.current
+    if (!textarea) return
+    setSelection({
+      start: textarea.selectionStart,
+      end: textarea.selectionEnd,
+    })
+  }
+
   const handleEditorKeyDown = (
     event: React.KeyboardEvent<HTMLTextAreaElement>
   ) => {
@@ -152,9 +258,9 @@ export const NotePage = () => {
   const displayTitle = title.trim() || 'Sem título'
 
   return (
-    <main className="flex min-h-screen flex-col bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100 md:flex-row">
+    <main className="flex min-h-screen flex-col bg-neutral-100 text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100 md:flex-row">
       <section className="flex min-h-screen min-w-0 flex-1 flex-col bg-white dark:bg-neutral-950">
-        <header className="flex min-h-14 items-center justify-between gap-4 border-b border-neutral-200 px-5 dark:border-neutral-800 md:px-8">
+        <header className="flex min-h-14 items-center justify-between gap-4 border-b border-neutral-200 bg-neutral-50 px-5 dark:border-neutral-800 dark:bg-transparent md:px-8">
           <div className="flex min-w-0 items-center gap-4">
             <Brand className="shrink-0" />
             <span
@@ -178,10 +284,20 @@ export const NotePage = () => {
                       ? 'Nota não salva'
                       : '')}
             </span>
+            {note && (
+              <Button
+                variant="secondary"
+                onClick={() => void handleDeleteNote()}
+                disabled={deleting || saving}
+                className="px-3 py-1.5 text-xs !text-red-600 hover:!bg-red-50 hover:!text-red-700 dark:!text-red-400 dark:hover:!bg-red-950/40 dark:hover:!text-red-300"
+              >
+                {deleting ? 'Excluindo' : 'Excluir'}
+              </Button>
+            )}
             <Button
               variant="secondary"
               onClick={() => void saveNote()}
-              disabled={saving || (!isDirty && note !== null)}
+              disabled={saving || deleting || (!isDirty && note !== null)}
               className="px-3 py-1.5 text-xs"
             >
               {saving ? 'Salvando' : 'Salvar'}
@@ -190,7 +306,7 @@ export const NotePage = () => {
           </div>
         </header>
 
-        <div className="flex items-center justify-between gap-4 border-b border-neutral-100 px-5 py-2.5 dark:border-neutral-900 md:px-8">
+        <div className="flex items-center justify-between gap-4 border-b border-neutral-200 bg-neutral-50 px-5 py-2.5 dark:border-neutral-900 dark:bg-transparent md:px-8">
           <div className="flex min-w-0 items-center gap-1 overflow-x-auto">
             <ToolbarButton
               label="Título"
@@ -198,10 +314,18 @@ export const NotePage = () => {
             >
               H
             </ToolbarButton>
-            <ToolbarButton label="Negrito" onClick={() => insertMarkdown('**')}>
+            <ToolbarButton
+              label="Negrito"
+              active={isMarkerActive('**')}
+              onClick={() => toggleMarkdown('**')}
+            >
               <strong>B</strong>
             </ToolbarButton>
-            <ToolbarButton label="Itálico" onClick={() => insertMarkdown('*')}>
+            <ToolbarButton
+              label="Itálico"
+              active={isMarkerActive('*')}
+              onClick={() => toggleMarkdown('*', 'texto')}
+            >
               <em>I</em>
             </ToolbarButton>
             <ToolbarButton
@@ -269,7 +393,7 @@ export const NotePage = () => {
             }`}
           >
             {mode !== 'preview' && (
-              <div className="flex min-h-[60vh] flex-col px-5 pb-4 pt-8 md:px-8 lg:px-12">
+              <div className="flex min-h-[60vh] flex-col px-5 pt-8 pb-4 md:px-8 lg:px-12">
                 <TextInput
                   id="note-title"
                   label="Título da nota"
@@ -294,6 +418,7 @@ export const NotePage = () => {
                     setSaveMessage('')
                   }}
                   onKeyDown={handleEditorKeyDown}
+                  onSelect={updateSelection}
                   placeholder={
                     'Comece a escrever em Markdown...\n\n# Uma nova ideia\n\nUse **negrito**, *itálico* ou crie uma lista.'
                   }
@@ -307,7 +432,7 @@ export const NotePage = () => {
               <MarkdownPreview
                 title={displayTitle}
                 content={content}
-                className={`min-h-[60vh] overflow-y-auto px-5 pb-10 pt-8 md:px-8 lg:px-12 ${
+                className={`min-h-[60vh] overflow-y-auto px-5 pt-8 pb-10 md:px-8 lg:px-12 ${
                   mode === 'split'
                     ? 'border-l border-neutral-100 dark:border-neutral-900'
                     : 'mx-auto w-full max-w-3xl'
@@ -317,10 +442,11 @@ export const NotePage = () => {
           </div>
         )}
 
-        <footer className="flex items-center justify-between border-t border-neutral-100 px-5 py-2.5 text-xs text-neutral-400 dark:border-neutral-900 md:px-8">
+        <footer className="flex items-center justify-between border-t border-neutral-200 bg-neutral-50 px-5 py-2.5 text-xs text-neutral-400 dark:border-neutral-900 dark:bg-transparent md:px-8">
           <div className="flex items-center gap-4">
             <span>
-              {content.trim() ? content.trim().split(/\s+/).length : 0} palavras
+              {content.trim() ? content.trim().split(/\s+/).length : 0}{' '}
+              palavras
             </span>
             <span>Markdown</span>
           </div>
@@ -330,7 +456,7 @@ export const NotePage = () => {
         {error && note && (
           <div
             role="alert"
-            className="fixed bottom-12 right-5 max-w-sm rounded-lg border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-800 shadow-lg dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200"
+            className="fixed right-5 bottom-12 max-w-sm rounded-lg border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-800 shadow-lg dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200"
           >
             {error}
           </div>
@@ -343,16 +469,27 @@ export const NotePage = () => {
 type ToolbarButtonProps = {
   label: string
   onClick: () => void
+  active?: boolean
   children: React.ReactNode
 }
 
-const ToolbarButton = ({ label, onClick, children }: ToolbarButtonProps) => (
+const ToolbarButton = ({
+  label,
+  onClick,
+  active = false,
+  children,
+}: ToolbarButtonProps) => (
   <button
     type="button"
     title={label}
     aria-label={label}
+    aria-pressed={active}
     onClick={onClick}
-    className="grid size-8 shrink-0 place-items-center rounded-md text-sm text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-900 dark:hover:text-neutral-100"
+    className={`grid size-8 shrink-0 place-items-center rounded-md text-sm transition ${
+      active
+        ? 'bg-neutral-200 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100'
+        : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-900 dark:hover:text-neutral-100'
+    }`}
   >
     {children}
   </button>
