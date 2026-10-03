@@ -20,9 +20,6 @@ const formatUpdatedAt = (note: Note) => {
   }).format(date)
 }
 
-// Achata o Markdown em texto corrido, pra caber num card de 3 linhas:
-// títulos viram negrito, listas viram "• item", links não ficam clicáveis
-// (o card inteiro já é um link, e <a> dentro de <a> é inválido).
 const excerptComponents: Components = {
   p: ({ children }) => <>{children} </>,
   h1: ({ children }) => <strong>{children} </strong>,
@@ -166,7 +163,7 @@ export const Home = () => {
                 <li key={note.id} className="group relative">
                   <Link
                     to={`/notes/${note.id}`}
-                    className="block h-full rounded-xl border border-neutral-200 bg-white p-5 transition hover:border-neutral-400 hover:bg-neutral-50 hover:shadow-md hover:shadow-neutral-900/5 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-neutral-600"
+                    className="block h-full rounded-xl border border-neutral-200 bg-white p-5 transition hover:shadow-lg hover:shadow-neutral-200 hover:border-neutral-400 dark:border-neutral-800 dark:bg-neutral-950 dark:hover:border-neutral-600 dark:hover:bg-neutral-950 dark:hover:shadow-lg dark:hover:shadow-neutral-900"
                   >
                     <div className="mb-3 flex items-start justify-between gap-3 pr-6">
                       <h3 className="truncate font-medium group-hover:text-black dark:group-hover:text-white">
@@ -195,7 +192,7 @@ export const Home = () => {
                     disabled={deletingId === note.id}
                     aria-label={`Excluir nota ${note.title || 'sem título'}`}
                     title="Excluir nota"
-                    className="absolute top-3 right-3 hidden rounded-md p-1.5 text-neutral-400 transition hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50 group-hover:block dark:hover:bg-red-950/40 dark:hover:text-red-300"
+                    className="cursor-pointer absolute top-3 right-3 hidden rounded-md p-1.5 text-neutral-400 transition hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50 group-hover:block dark:hover:bg-red-950/40 dark:hover:text-red-300"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

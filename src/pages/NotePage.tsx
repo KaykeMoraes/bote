@@ -445,8 +445,7 @@ export const NotePage = () => {
         <footer className="flex items-center justify-between border-t border-neutral-200 bg-neutral-50 px-5 py-2.5 text-xs text-neutral-400 dark:border-neutral-900 dark:bg-transparent md:px-8">
           <div className="flex items-center gap-4">
             <span>
-              {content.trim() ? content.trim().split(/\s+/).length : 0}{' '}
-              palavras
+              {content.trim() ? content.trim().split(/\s+/).length : 0} palavras
             </span>
             <span>Markdown</span>
           </div>

@@ -6,11 +6,11 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variantStyles: Record<NonNullable<ButtonProps['variant']>, string> = {
   primary:
-    'bg-neutral-900 text-white hover:bg-neutral-700 focus-visible:outline-neutral-500 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-300',
+    'cursor-pointer bg-neutral-900 text-white hover:bg-neutral-700 focus-visible:outline-neutral-500 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-300',
   secondary:
-    'border border-neutral-200 text-neutral-700 hover:bg-neutral-100 focus-visible:outline-neutral-400 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-900',
+    'cursor-pointer border border-neutral-200 text-neutral-700 hover:bg-neutral-100 focus-visible:outline-neutral-400 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-900',
   ghost:
-    'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-neutral-400 dark:text-neutral-300 dark:hover:bg-neutral-900 dark:hover:text-neutral-100',
+    'cursor-pointer text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-neutral-400 dark:text-neutral-300 dark:hover:bg-neutral-900 dark:hover:text-neutral-100',
 }
 
 export const Button = ({
