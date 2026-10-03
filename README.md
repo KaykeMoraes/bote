@@ -7,7 +7,7 @@ Bote is a simple Markdown note-taking app built with React and TypeScript.
 - Email and password account creation and sign-in
 - Protected notes area for authenticated users
 - React Router-based navigation
-- Firebase Authentication and Realtime Database integration
+- Firebase Authentication and Firestore for persistence
 - Vite-powered development experience with TypeScript
 
 ## Tech stack
@@ -24,7 +24,7 @@ Bote is a simple Markdown note-taking app built with React and TypeScript.
 
 - [Bun](https://bun.com/)
 - A Firebase project with Email/Password authentication enabled
-- A Firebase Realtime Database
+- A Firestore database
 
 ### Installation
 
